@@ -1,4 +1,5 @@
 import { fetchPokemonList, PokemonListResult } from "./pokemon";
+import { Pokemon } from "./pokemon.type";
 import { fetchPokemonJapaneseName } from "./pokemonSpecies";
 
 export type PokemonWithJapaneseName = {
@@ -30,9 +31,26 @@ export const fetchPokemonListWithJapaneseNames = async (
                 );
 
                 const japaneseName = await fetchPokemonJapaneseName(speciesUrl);
+                const pokemonDetails: Pokemon = await fetch(pokemon.url).then(res => res.json());
 
-                // const pokemonDetails: Pokemon = await fetch(pokemon.url).then(res => res.)
+                return {
+                    ...pokemon,
+                    japaneseName,
+                    number: pokemonDetails.id.toString(),
+                    types: pokemonDetails.types.map((t) => ({
+                        type: {
+                            name: t.type.name
+                        }
+                    })),
+                    abilities: pokemonDetails.abilities.map((a) => ({
+                        ability: {
+                            name: a.ability.name
+                        }
+                    }))
+                };
             }
         )
-    )
-}
+    );
+
+    return { ...pokemonList, results: updateResults };
+};
